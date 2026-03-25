@@ -3,16 +3,11 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-# ─────────────────────────────────────────────────────────────
-# 1.  LOAD REAL DATA
-# ─────────────────────────────────────────────────────────────
-
-JOBS = ["teacher", "health", "services", "at_home"]  # 'other' = baseline
+JOBS = ["teacher", "health", "services", "at_home"] # 'other' = baseline
 
 def load_csv(filepath: str):
     """
-    Load student-por.csv (semicolon-separated).
+    Load student-por.csv
     Returns encoded feature matrix X, target y, and feature names.
     """
     rows = []
@@ -33,11 +28,12 @@ def load_csv(filepath: str):
          int(r["absences"]), float(r["G1"]), float(r["G2"]))
         for r in rows
     ]
-    y = np.array([float(r["G3"]) * 5 for r in rows])  # convert 0-20 to 0-100
+    # Convert 0-20 to 0-100
+    y = np.array([float(r["G3"]) * 5 for r in rows])
     X, feature_names = encode_features(raw)
     return X, y, feature_names
 
-# 2.  FEATURE ENCODING
+# Feature Encoding
 
 REASONS   = ["home", "reputation", "course"]   # 'other' = baseline
 GUARDIANS = ["mother", "father"]                # 'other' = baseline
@@ -98,7 +94,7 @@ def encode_features(raw):
     )
     return np.array(rows, dtype=float), feature_names
 
-# 3.  PRE-PROCESSING
+# Pre-processing
 
 def train_test_split(X, y, test_ratio=0.2, seed=0):
     rng = np.random.default_rng(seed)
@@ -116,7 +112,7 @@ def standardize(X_train, X_test):
 def add_bias(X):
     return np.hstack([np.ones((len(X), 1)), X])
 
-# 4.  MODELS
+# Models
 
 def fit_normal_equation(X, y):
     """ w = (XᵀX)⁻¹ Xᵀy """
@@ -138,7 +134,7 @@ def fit_gradient_descent(X, y, lr=0.05, n_epochs=1000):
 def predict(X, w):
     return X @ w
 
-# 5.  METRICS
+# 5.  Metrics
 
 def mse(y_true, y_pred):
     return float(np.mean((y_true - y_pred) ** 2))
@@ -148,7 +144,7 @@ def r2(y_true, y_pred):
     ss_tot = np.sum((y_true - y_true.mean()) ** 2)
     return float(1 - ss_res / ss_tot)
 
-# 6.  PLOTS
+# 6.  Plots
 
 def plot_predictions(y_true, y_pred_ols, y_pred_gd):
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -192,10 +188,10 @@ def plot_coefficients(w_ols, feature_names):
     plt.savefig("coefficients.png", dpi=150)
     plt.show()
 
-# 7.  MAIN
+# Main
 
 def main():
-    # Load real data — make sure student-por.csv is in the same folder
+    # Load data
     X, y, feature_names = load_csv("student-por.csv")
 
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_ratio=0.2)
